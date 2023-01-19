@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO: standalone vs cluster mode 
-
 masterIP="192.168.0.1"
 masterWorkerPort="65509"
 slaveWorkerPort="65510"
@@ -16,14 +14,13 @@ jar="advanced-db-taxi-routes_2.12-1.0.jar"
 class="AdvancedDBBenchmarker"
 deployMode="client"
 
-firstResult="/home/user/project/results/first_result"
-secondResult="/home/user/project/results/second_result"
+firstResult="/home/user/ADB-code/results/first_result"
+secondResult="/home/user/ADB-code/results/second_result"
 
 # Build Scala, put jar to hdfs
-cd ~/project/scala/ 
+cd /home/user/ADB-code
 ~/sbt/bin/sbt package
-hdfs dfs -put -f /home/user/project/scala/target/scala-2.12/$jar /jars/$jar
-
+hdfs dfs -put -f ~/ADB-code/target/scala-2.12/$jar /jars/$jar
 # One worker
 spark-daemon.sh start org.apache.spark.deploy.worker.Worker 1 \
 --webui-port $webUIPort --port $masterWorkerPort --cores $cores --memory $memory spark://$masterIP:$masterSparkPort
@@ -34,13 +31,12 @@ $SPARK_HOME/bin/spark-submit \
 hdfs://$masterIP:$masterHDFSPort//jars/$jar $firstResult
 
 # Latex table
-# python3.8 table.py
 
 # Two workers
 secondWorkerCommand="$SPARK_HOME/sbin/spark-daemon.sh start org.apache.spark.deploy.worker.Worker 2 \
 --webui-port $webUIPort --port $slaveWorkerPort --cores $cores --memory $memory spark://$masterIP:$masterSparkPort"
 
-ssh user@snf-33421 $secondWorkerCommand
+ssh user@snf-34140 $secondWorkerCommand
 
 # Submit
 $SPARK_HOME/bin/spark-submit \
@@ -48,4 +44,3 @@ $SPARK_HOME/bin/spark-submit \
 hdfs://$masterIP:$masterHDFSPort//jars/$jar $secondResult
 
 # Latex table
-# python3.8 table.py
