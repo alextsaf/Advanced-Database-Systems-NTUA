@@ -30,12 +30,14 @@ $SPARK_HOME/bin/spark-submit \
 --class $class --master spark://$masterIP:$masterSparkPort --deploy-mode $deployMode \
 hdfs://$masterIP:$masterHDFSPort//jars/$jar $firstResult
 
-for i in 1 2 3 3RDD 4 5
+for i in Query1 Query2 Query3 Query3RDD Query4 Query5
 do
-    mv -f  $firstResult/Query${i}/part* $firstResult/Query${i}.csv
-    rm -rf $firstResult/Query${i}
+    mv -f  $firstResult/${i}/part* $firstResult/${i}.csv
+    rm -rf $firstResult/${i}
 done
-# Latex table
+
+cat $firstResult/Times/part* >> $firstResult/Times.csv
+rm -rf $firstResult/Times
 
 # Two workers
 secondWorkerCommand="$SPARK_HOME/sbin/spark-daemon.sh start org.apache.spark.deploy.worker.Worker 2 \
@@ -48,10 +50,14 @@ $SPARK_HOME/bin/spark-submit \
 --class $class --master spark://$masterIP:$masterSparkPort --deploy-mode $deployMode \
 hdfs://$masterIP:$masterHDFSPort//jars/$jar $secondResult
 
-for i in 1 2 3 3RDD 4 5
+for i in Query1 Query2 Query3 Query3RDD Query4 Query5
 do
-    mv -f  $secondResult/Query${i}/part* $secondResult/Query${i}.csv
-    rm -rf $secondResult/Query${i}
+    mv -f  $secondResult/${i}/part* $secondResult/${i}.csv
+    rm -rf $secondResult/${i}
 done
 
-# Latex table
+cat $secondResult/Times/part* >> $secondResult/Times.csv
+rm -rf $secondResult/Times
+
+kill $(netstat -tlnp | grep $masterWorkerPort | sed "s|.*LISTEN      \([0-9]\+\)/java|\1|g")
+ssh user@snf-34140 'kill $(netstat -tlnp | grep '$slaveWorkerPort' | sed "s|.*LISTEN      \([0-9]\+\)/java|\1|g")'
