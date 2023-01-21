@@ -24,3 +24,6 @@ hdfs dfs -put -f ~/data/taxi+_zone_lookup.csv "/data/"
 
 echo -e "${GREEN}DONE [7/7]${NC}"
 
+pip3.8 install pandas
+pip3.8 install tabulate
+

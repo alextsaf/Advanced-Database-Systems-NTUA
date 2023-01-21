@@ -151,7 +151,7 @@ object AdvancedDBBenchmarker {
                                 FROM ${maxPassengersPerHour})"""
 
         // Limit results to 3
-        val query4DF = spark.sql(s"""SELECT hour, weekday, weekday_rank as rank, max_passengers
+        val query4DF = spark.sql(s"""SELECT weekday, hour, weekday_rank as rank, max_passengers
                               FROM $orderedHours
                               WHERE weekday_rank <=3
                               ORDER BY weekday ASC, rank ASC""")

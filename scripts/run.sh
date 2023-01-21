@@ -61,3 +61,5 @@ rm -rf $secondResult/Times
 
 kill $(netstat -tlnp | grep $masterWorkerPort | sed "s|.*LISTEN      \([0-9]\+\)/java|\1|g")
 ssh user@snf-34140 'kill $(netstat -tlnp | grep '$slaveWorkerPort' | sed "s|.*LISTEN      \([0-9]\+\)/java|\1|g")'
+
+python3.8 /home/user/ADB-code/scripts/print-output.py
