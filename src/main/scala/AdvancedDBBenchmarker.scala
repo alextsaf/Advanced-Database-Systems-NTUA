@@ -37,7 +37,7 @@ object AdvancedDBBenchmarker {
 
       def query1() : Float = {
 
-        val start = System.nanoTime()
+        val start = System.currentTimeMillis()
 
         val maxTipAmount = """(SELECT MAX(Tip_amount) as max_tip_amount 
                               FROM Taxi_Trips 
@@ -48,16 +48,16 @@ object AdvancedDBBenchmarker {
                                   WHERE DOZone  == 'Battery Park' AND MONTH(tpep_pickup_datetime) == 3""")
         query1DF.show()
 
-        val time = System.nanoTime() - start
+        val time = System.currentTimeMillis() - start
 
         query1DF.repartition(1).write.option("header","true").mode("overwrite").csv(s"${args(0)}/Query1")
 
-        time
+        time / 1000F
       }
 
       def query2() : Float = {
 
-        val start = System.nanoTime()
+        val start = System.currentTimeMillis()
 
         val maxTollAmountperMonth = s"""(SELECT MONTH(tpep_pickup_datetime) as month, MAX(Tolls_amount) as max_tolls_amount 
                                         FROM Taxi_Trips 
@@ -71,17 +71,17 @@ object AdvancedDBBenchmarker {
         
         query2DF.show()
         
-        val time = System.nanoTime() - start
+        val time = System.currentTimeMillis() - start
         
         query2DF.repartition(1).write.option("header","true").mode("overwrite").csv(s"${args(0)}/Query2")
       
-        time   
+        time / 1000F   
       
       }
 
       def query3SQL() : Float = {
 
-        val start = System.nanoTime()
+        val start = System.currentTimeMillis()
 
         val query3DF = spark.sql(s"""SELECT MONTH(tpep_pickup_datetime) as trip_month, (CASE WHEN DAY(tpep_pickup_datetime) > 15 THEN 2 ELSE 1 END) as half_of_the_month, AVG(Trip_distance) as average_trip_distance, AVG(Total_amount) as average_total_amount
                                   FROM Taxi_Trips
@@ -91,17 +91,17 @@ object AdvancedDBBenchmarker {
        
         query3DF.show()
        
-        val time = System.nanoTime() - start
+        val time = System.currentTimeMillis() - start
 
         query3DF.repartition(1).write.option("header","true").mode("overwrite").csv(s"${args(0)}/Query3")
       
-        time   
+        time / 1000F   
       
       }
 
       def query3RDD() : Float = {
 
-        val start = System.nanoTime()
+        val start = System.currentTimeMillis()
 
         val rddColumns = taxiTripsDf.columns
         val puDatetimeIndex = rddColumns.indexOf("tpep_pickup_datetime")
@@ -130,17 +130,17 @@ object AdvancedDBBenchmarker {
 
         query3RDD.foreach(row => print(s"${row._1._1}, ${row._1._2}, ${row._2._1}, , ${row._2._3}\n"))
 
-        val time = System.nanoTime() - start
+        val time = System.currentTimeMillis() - start
 
         query3RDD.map(row => s"${row._1._1},${row._1._2},${row._2._1},${row._2._3}").repartition(1).saveAsTextFile(s"${args(0)}/Query3RDD")
       
-        time   
+        time / 1000F   
       
       }
 
       def query4(): Float = {
 
-        val start = System.nanoTime()
+        val start = System.currentTimeMillis()
 
         val maxPassengersPerHour = """(SELECT MAX(passenger_count) AS max_passengers, HOUR(tpep_pickup_datetime) as hour, WEEKDAY(tpep_pickup_datetime) as weekday 
                                       FROM Taxi_Trips 
@@ -158,17 +158,17 @@ object AdvancedDBBenchmarker {
        
         query4DF.show()
        
-        val time = System.nanoTime() - start
+        val time = System.currentTimeMillis() - start
        
         query4DF.repartition(1).write.option("header","true").mode("overwrite").csv(s"${args(0)}/Query4")
         
-        time   
+        time / 1000F   
       
       }
 
       def query5(): Float = {
 
-        val start = System.nanoTime()
+        val start = System.currentTimeMillis()
 
         val tipPercentages = """(SELECT MONTH(tpep_pickup_datetime) AS Month, DAY(tpep_pickup_datetime) AS Day, (SUM(Tip_amount)/SUM(Fare_amount))*100 AS Percentage
                                 FROM Taxi_Trips 
@@ -186,11 +186,11 @@ object AdvancedDBBenchmarker {
         
         query5DF.show()
         
-        val time = System.nanoTime() - start
+        val time = System.currentTimeMillis() - start
         
         query5DF.repartition(1).write.option("header","true").mode("overwrite").csv(s"${args(0)}/Query5")      
 
-        time   
+        time / 1000F   
       }
 
 
